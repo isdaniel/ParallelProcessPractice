@@ -19,12 +19,7 @@ namespace DanielDemo
         public TaskPool(int step,int limitThreadCount)
         {
             
-            _taskQueue = new ConcurrentQueue<MyTask>(Enumerable.Range(1,1024).Select(x=> default(MyTask)));
-            MyTask t;
-            while (_taskQueue.TryDequeue(out t))
-            {
-                
-            }
+            _taskQueue = new ConcurrentQueue<MyTask>();
             _threadPool = new List<Thread>();
             _queueSignal = new ManualResetEvent(false);
             this._step = step;
