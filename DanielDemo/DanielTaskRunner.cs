@@ -30,14 +30,12 @@ namespace DanielDemo
         public void AddTask(MyTask task){
             _taskQueue.Enqueue(task);
             _queueSignal.Set();
-            _queueSignal.Reset();
         }
 
         private void InitPool(){
             for (int i = 0; i < _limitThreadCount; i++)
             {
                 Thread worker = new Thread(Process);
-   
                 worker.Start();
                 _threadPool.Add(worker);
             }
@@ -47,7 +45,7 @@ namespace DanielDemo
         {
             while (true)
             {
-                while (_taskQueue.Count > 0)
+                while (!_taskQueue.IsEmpty)
                 {
                     MyTask task = null;
                     if(_taskQueue.TryDequeue(out task)){
@@ -61,8 +59,9 @@ namespace DanielDemo
                 if (_finished){
                     break;
                 }
-
+                
                 _queueSignal.WaitOne();
+                _queueSignal.Reset();
             }
         }
 
@@ -73,9 +72,9 @@ namespace DanielDemo
 
             do
             {
-              var thread = _threadPool[0];
-              thread.Join();
-              _threadPool.Remove(thread);
+                var thread = _threadPool[0];
+                thread.Join();
+                _threadPool.Remove(thread);
             } while (_threadPool.Count > 0);
             
             if (NextPool != null)
